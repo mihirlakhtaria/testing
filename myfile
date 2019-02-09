@@ -1,0 +1,291 @@
+Creation of Employee table:
+
+CREATE TABLE Employee(
+ emp_id serial PRIMARY KEY,
+ emp_name VARCHAR (50)  NOT NULL,
+ emp_type SMALLINT  NOT NULL,
+ email VARCHAR (355) UNIQUE NOT NULL,
+ joining_date DATE NOT NULL,
+ emp_status BOOLEAN NOT NULL,
+ gender BOOLEAN NOT NULL;
+);
+
+
+Creation of Attendence table:
+
+CREATE TABLE Attendence(
+ att_id serial PRIMARY KEY,
+ emp_id INTEGER NOT NULL REFERENCES Employee(emp_id),
+ att_date DATE NOT NULL,
+ att_status BOOLEAN NOT NULL
+);
+
+
+Creation of Salary table:
+
+CREATE TABLE Salary(
+ sal_id serial PRIMARY KEY,
+ emp_id INTEGER NOT NULL REFERENCES Employee(emp_id),
+ sal_net_amount INTEGER NOT NULL,
+ sal_date DATE NOT NULL,
+ sal_paid_amount INTEGER NOT NULL
+);
+
+
+Creation of Review table:
+
+CREATE TABLE Review(
+ review_id serial PRIMARY KEY,
+ emp_id INTEGER NOT NULL REFERENCES Employee(emp_id),
+ review_date DATE NOT NULL,
+ review_rating SMALLINT NOT NULL
+);
+
+
+
+Creation of Project table:
+
+CREATE TABLE Project (
+project_id serial PRIMARY KEY,
+project_name VARCHAR (55) NOT NULL,
+project_location VARCHAR (55) NOT NULL,
+Project_description VARCHAR (355)
+);
+
+
+Creation of Works_On table:
+
+CREATE TABLE Works_On (
+project_id integer,
+emp_id INTEGER REFERENCES Employee(emp_id),
+hours INTEGER NOT NULL
+);
+
+
+
+*********** Date is in yyyy-mm-dd format************
+
+Insertion of data in Employee table:
+
+INSERT INTO EMPLOYEE (emp_name,emp_type,email,joining_date,emp_status,gender) VALUES ('Mihir Lakhtaria',1,'mihirlakhtaria@gmail.com','2018-01-02',true,true);
+emp_id
+Insertion of data in Attendance table:
+
+INSERT INTO Attendence (emp_id,att_date,att_status) VALUES (1,'2018-01-02',true);
+
+
+Insertion of data in Review table:
+
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (2,'2018-01-31',2);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (3,'2018-01-31',3);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (4,'2018-01-31',4);
+
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (1,'2018-02-28',4);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (2,'2018-02-28',5);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (3,'2018-02-28',5);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (4,'2018-02-28',3);
+
+
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (1,'2018-03-31',3);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (2,'2018-03-31',4);
+INSERT INTO Review (emp_id,review_date,review_rating) VALUES (3,'2018-03-31',5);
+
+
+Insertion of data in Salary table:
+
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (1,100,'2018-01-31',120);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (2,120,'2018-01-31',140);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (3,140,'2018-01-31',180);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (4,160,'2018-01-31',200);
+
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (1,100,'2018-02-28',120);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (2,130,'2018-02-28',140);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (3,140,'2018-02-28',180);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (4,160,'2018-02-28',200);
+
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (1,100,'2018-03-31',120);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (2,120,'2018-03-31',140);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (3,140,'2018-03-31',180);
+INSERT INTO Salary (emp_id,sal_net_amount,sal_date,sal_paid_amount) VALUES (4,170,'2018-03-31',200);
+
+
+
+Insertion of data in Project table:
+INSERT INTO PROJECT  (project_name,project_location,Project_description) VALUES ('Project-1','Ahmedabad','FREE KA PRJECT For company XYZ');
+INSERT INTO PROJECT  (project_name,project_location,Project_description) VALUES ('Project-2','Gandhinagar','FREE KA PRJECT For company ABC');
+
+
+Insertion of data in Works_On table:
+
+Insert INTO Works_On  (project_id,emp_id,hours) VALUES (1,1,8);
+Insert INTO Works_On  (project_id,emp_id,hours) VALUES (1,2,9);
+Insert INTO Works_On  (project_id,emp_id,hours) VALUES (1,4,8);
+
+Insert INTO Works_On  (project_id,emp_id,hours) VALUES (2,2,9);
+Insert INTO Works_On  (project_id,emp_id,hours) VALUES (2,1,8);
+
+************************************************************************************************************
+Queries and Results:
+1)
+SELECT emp_id AS EMPLOYEE_GROUP_ID, COUNT(emp_id) AS NUMBER_OF_EMPLOYEES FROM EMPLOYEE GROUP BY emp_id; 
+
+2)
+SELECT emp_name, count(case when att_status = true then 1 else null end) as Present,count(case when att_status = false then 1 else null end) as Absent FROM Employee, Attendence WHERE Employee.emp_id = Attendence.emp_id GROUP BY Employee.emp_name; 
+
+
+3)
+SELECT Distinct emp_name,count(case when att_status = false then 1 else null end) as Absent, 
+(CASE WHEN (count(case when att_status = false then 1 else null end) ) > 8 then 'red' else 'green' end )
+FROM Employee, Attendence WHERE Employee.emp_id = Attendence.emp_id GROUP BY Employee.emp_name; 
+
+4)
+SELECT Employee.emp_name, SUM (Salary.sal_net_amount), SUM (Salary.sal_paid_amount - Salary.sal_net_amount) AS Deductions 
+FROM Employee INNER JOIN Salary on Employee.emp_id = Salary.emp_id Group BY Employee.emp_name;
+
+5)
+SELECT Employee.emp_name,Salary.sal_net_amount FROM Employee, Salary WHERE Employee.emp_id = Salary.emp_id and
+Salary.sal_date BETWEEN '2018-01-01' AND '2018-03-31' ORDER BY Salary.sal_net_amount DESC OFFSET 1 ROW  FETCH FIRST 1 ROW ONLY ;
+
+6)
+SELECT Employee.emp_name from Employee where Employee.emp_id IN(
+
+SELECT Review.emp_id from Review where Review.review_rating=5 AND Review.review_date BETWEEN '2018-02-01' AND '2018-02-28' AND Review.emp_id 
+NOT IN (
+SELECT   Attendence.emp_id from Attendence where  Attendence.att_status = FALSE  AND   Attendence.att_date BETWEEN '2018-02-01' AND '2018-02-28'
+
+)
+) ;
+
+
+
+7)
+SELECT emp_id,(CASE WHEN Salary.sal_net_amount <= 100 then Salary.sal_net_amount else '-' end ) AS LESS_THAN_100,
+(CASE WHEN (Salary.sal_net_amount >100) AND (Salary.sal_net_amount <150) then Salary.sal_net_amount else '-' end )AS LESS_THAN_150_GREAT_THAN_100,
+(CASE WHEN (Salary.sal_net_amount >150) AND (Salary.sal_net_amount <200) then Salary.sal_net_amount else '-' end ) AS LESS_THAN_200_GREAT_THAN_100
+FROM Salary WHERE Salary.sal_date BETWEEN '2018-02-01' AND '2018-02-28' ;
+
+8)
+Select Employee.emp_name from Employee where Employee.emp_id IN(
+Select  s.emp_id from Salary s Join Salary  t on s.emp_id = t.emp_id Where t.sal_date BETWEEN '2018-02-01' AND '2018-02-28' AND 
+s.sal_date BETWEEN '2018-01-01' AND '2018-01-31' AND (s.sal_net_amount)-(t.sal_net_amount)!=0 Group By t.sal_id,s.sal_id);
+
+9)
+SELECT COUNT(Employee.gender) As Male_Count from Employee where Employee.gender=true;
+
+10)SELECT * FROM attreport1('2018-02-05');
+
+11)
+
+12)
+Select Employee.emp_name from Employee where Employee.emp_id IN (
+
+SELECT Works_On.emp_id FROM Works_On GROUP BY Works_On.emp_id HAVING COUNT(Works_On.project_id) = (SELECT COUNT(Project.project_id) FROM Project )
+);
+
+13)
+Select Employee.emp_name from Employee where Employee.emp_id NOT IN (
+SELECT Works_On.emp_id FROM Works_On GROUP BY Works_On.emp_id );
+
+14)
+SELECT * FROM Employee,Salary WHERE Employee.emp_id = Salary.emp_id AND Salary.sal_date BETWEEN '2018-02-01' AND '2018-02-28' AND Employee.emp_id IN (
+SELECT Salary.emp_id FROM Salary GROUP BY Salary.emp_id,Salary.sal_net_amount HAVING Salary.sal_net_amount > 
+(
+SELECT AVG(Salary.sal_net_amount) FROM Salary WHERE Salary.sal_date BETWEEN '2018-02-01' AND '2018-02-28') 
+);
+
+
+10) FUNCTION:
+
+CREATE OR REPLACE FUNCTION attreport1(tdate DATE)  RETURNS TABLE (
+ emp_name VARCHAR,
+ present_days BIGINT,
+  absent_days BIGINT,
+  total_days BIGINT
+) 
+AS $$
+BEGIN
+RETURN QUERY 
+   SELECT Employee.emp_name, count(case when att_status = true then 1 else null end) ,
+   count(case when att_status = false then 1 else null end),COUNT(1)  FROM Employee,
+   Attendence WHERE Employee.emp_id = Attendence.emp_id
+   AND Attendence.att_date <= (SELECT (date_trunc('month', '2018-02-05'::date) + interval '1 month' - interval '1 day')::date)
+   AND 
+   Attendence.att_date >= (SELECT date_trunc('MONTH','2018-02-05'::date)::DATE)
+      GROUP BY Employee.emp_name;
+   END;
+$$
+LANGUAGE plpgsql;
+
+
+
+
+
+*****************************
+/*
+SELECT Employee.emp_name,(SELECT COUNT(Attendence.att_status) FROM Attendence where Attendence.att_status = TRUE GROUP BY emp_id) AS PRESENT_DAYS,
+(SELECT COUNT(Attendence.att_status) FROM Attendence where Attendence.att_status = FALSE GROUP BY emp_id) AS ABSENT_DAYS 
+from Employee INNER JOIN Attendence on Employee.emp_id = Attendence.emp_id GROUP BY Employee.emp_id ;
+
+select emp_id, (select count(att_status) from Attendence where att_status=true ) as present_days from Attendence group by emp_id;
+
+
+select Distinct (select count(att_status) from attendence where attendence.att_status=true and emp_id=1) as present,
+(select count(att_status) from attendence where attendence.att_status=false and emp_id=1) as absent from Attendence;
+*/
+
+/*
+SELECT emp_name, count(case when att_status = true then 1 else 0 end) as pday,
+count(case when att_status = true then 1 else 0 end) as eday
+
+count(att_status) as attendance_Count,(CASE when (att_status = 'true') THEN @pday :=+1 ELSE @eday := +1 END ) as attendance
+
+FROM Employee, Attendence WHERE Employee.emp_id = Attendence.emp_id GROUP BY Employee.emp_name; 
+
+*/
+
+/*
+SELECT Distinct emp_name,count(case when att_status = false then 1 else null end) as Absent, 
+(CASE WHEN (count(case when att_status = false then 1 else null end) ) > 8 then 'red' else 'green' end )
+FROM Employee, Attendence WHERE Employee.emp_id = Attendence.emp_id GROUP BY Employee.emp_name; 
+*/
+/*
+///////////////// Starting and ending date
+SELECT (date_trunc('month', '2018-02-05'::date) + interval '1 month' - interval '1 day')::date
+AS end_of_month;
+
+SELECT date_trunc('MONTH','2018-02-05'::date)::DATE;
+
+SELECT date_trunc('MONTH','2018-02-05'::date)::DATE AND 
+   SELECT (date_trunc('month', '2018-02-05'::date) + interval '1 month' - interval '1 day')::date
+
+
+////////////////
+
+
+
+
+
+CREATE OR REPLACE FUNCTION attreport1(tdate DATE)  RETURNS TABLE (
+ emp_name VARCHAR,
+ present_days BIGINT,
+  absent_days BIGINT,
+  total_days BIGINT
+) 
+AS $$
+BEGIN
+RETURN QUERY 
+   SELECT Employee.emp_name, count(case when att_status = true then 1 else null end) ,
+   count(case when att_status = false then 1 else null end),COUNT(1)  FROM Employee,
+   Attendence WHERE Employee.emp_id = Attendence.emp_id
+   AND Attendence.att_date <= (SELECT (date_trunc('month', tdate::date) + interval '1 month' - interval '1 day')::date)
+   AND 
+   Attendence.att_date >= (SELECT date_trunc('MONTH',tdate::date)::DATE)
+      GROUP BY Employee.emp_name;
+   END;
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM attreport1('2018-01-15');
+
+
+*/
